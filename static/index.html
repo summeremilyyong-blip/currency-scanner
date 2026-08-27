@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Currency Scanner</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <header>
+
+        <div class="logo">
+            💴
+        </div>
+
+        <div>
+
+            <h1>
+                Currency Scanner
+            </h1>
+
+            <p>
+                Japanese Yen & Thai Baht
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================
+         MAIN CARD
+    ====================================== -->
+
+    <main>
+
+
+        <!-- CAMERA -->
+
+        <section
+            id="cameraContainer"
+            class="camera-container"
+        >
+
+            <video
+                id="camera"
+                autoplay
+                playsinline
+            ></video>
+
+
+            <div class="camera-overlay">
+
+                <div class="scan-frame">
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </div>
+
+                <p>
+                    Place the banknote inside the frame
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- CAMERA BUTTONS -->
+
+        <div class="camera-buttons">
+
+            <button
+                id="cameraButton"
+                class="primary-button"
+            >
+                📷 Start Camera
+            </button>
+
+
+            <button
+                id="captureButton"
+                class="primary-button"
+                style="display:none;"
+            >
+                🔍 Scan Banknote
+            </button>
+
+
+            <button
+                id="switchCameraButton"
+                class="secondary-button"
+                style="display:none;"
+            >
+                🔄 Switch Camera
+            </button>
+
+        </div>
+
+
+        <!-- DIVIDER -->
+
+        <div class="divider">
+
+            <span>OR</span>
+
+        </div>
+
+
+        <!-- UPLOAD -->
+
+        <div class="upload-section">
+
+            <label
+                for="imageInput"
+                class="upload-button"
+            >
+
+                <span class="upload-icon">
+                    🖼️
+                </span>
+
+                <span>
+                    Choose Image
+                </span>
+
+            </label>
+
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*"
+                hidden
+            >
+
+
+            <p>
+                JPG, PNG or other image files
+            </p>
+
+        </div>
+
+
+        <!-- IMAGE PREVIEW -->
+
+        <div
+            id="previewContainer"
+            class="preview-container"
+            style="display:none;"
+        >
+
+            <img
+                id="preview"
+                alt="Selected banknote"
+            >
+
+        </div>
+
+
+        <!-- UPLOAD SCAN BUTTON -->
+
+        <button
+            id="scanButton"
+            class="scan-upload-button"
+            style="display:none;"
+        >
+            🔍 Scan Selected Image
+        </button>
+
+
+        <!-- =====================================
+             LOADING
+        ====================================== -->
+
+        <div
+            id="loading"
+            class="loading"
+            style="display:none;"
+        >
+
+            <div class="spinner"></div>
+
+            <p>
+                Analyzing banknote...
+            </p>
+
+        </div>
+
+
+        <!-- =====================================
+             RESULT
+        ====================================== -->
+
+        <section
+            id="result"
+            class="result"
+            style="display:none;"
+        >
+
+            <div class="result-header">
+
+                <div
+                    id="flag"
+                    class="flag"
+                >
+                    🇯🇵
+                </div>
+
+                <div>
+
+                    <p class="detected-label">
+                        DETECTED
+                    </p>
+
+                    <h2 id="currencyName">
+                        Japanese Yen
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="amount-card">
+
+                <p>
+                    Banknote Value
+                </p>
+
+                <div
+                    id="amount"
+                    class="amount"
+                >
+                    ¥1,000
+                </div>
+
+            </div>
+
+
+            <!-- CONFIDENCE -->
+
+            <div class="confidence-box">
+
+                <div>
+
+                    <span>
+                        AI Confidence
+                    </span>
+
+                    <strong
+                        id="confidence"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="confidence-bar">
+
+                    <div
+                        id="confidenceBar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- EXCHANGE -->
+
+            <div class="exchange-card">
+
+                <div class="exchange-title">
+
+                    💱 Live Exchange Rate
+
+                </div>
+
+
+                <div
+                    id="exchangeRate"
+                    class="exchange-rate"
+                >
+                    Exchange rate
+                </div>
+
+
+                <div
+                    id="converted"
+                    class="converted"
+                >
+                    ฿0.00
+                </div>
+
+
+                <div class="rate-info">
+
+                    <span>
+                        📅
+                        <span id="rateDate">
+                            -
+                        </span>
+                    </span>
+
+
+                    <span>
+                        🕐
+                        <span id="rateTime">
+                            -
+                        </span>
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- DETAILS -->
+
+            <div class="details">
+
+                <div>
+
+                    <span>
+                        Currency
+                    </span>
+
+                    <strong id="currencyCode">
+                        JPY
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Country
+                    </span>
+
+                    <strong id="country">
+                        Japan
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Target
+                    </span>
+
+                    <strong id="targetCurrency">
+                        THB
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- NEW SCAN -->
+
+            <button
+                id="newScanButton"
+                class="new-scan-button"
+            >
+                🔄 Scan Another Banknote
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            Currency Scanner • AI-powered banknote recognition
+        </p>
+
+    </footer>
+
+</div>
+
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>
