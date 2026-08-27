@@ -12,17 +12,32 @@ from inference_sdk import InferenceHTTPClient
 
 
 # ==========================================
-# LOAD ENVIRONMENT VARIABLES
+# LOAD ENV
 # ==========================================
 
 load_dotenv()
 
 ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 MODEL_ID = os.getenv("MODEL_ID")
-
 ROBOFLOW_API_URL = os.getenv(
     "ROBOFLOW_API_URL",
     "https://serverless.roboflow.com"
+)
+
+if not ROBOFLOW_API_KEY:
+    raise ValueError("ไม่พบ ROBOFLOW_API_KEY ใน .env")
+
+if not MODEL_ID:
+    raise ValueError("ไม่พบ MODEL_ID ใน .env")
+
+
+# ==========================================
+# ROBOFLOW CLIENT
+# ==========================================
+
+client = InferenceHTTPClient(
+    api_url=ROBOFLOW_API_URL,
+    api_key=ROBOFLOW_API_KEY
 )
 
 
@@ -35,11 +50,6 @@ app = FastAPI(
     version="1.0"
 )
 
-
-# ==========================================
-# CORS
-# ==========================================
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -47,20 +57,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# ==========================================
-# ROBOFLOW CLIENT
-# ==========================================
-
-client = None
-
-if ROBOFLOW_API_KEY and MODEL_ID:
-
-    client = InferenceHTTPClient(
-        api_url=ROBOFLOW_API_URL,
-        api_key=ROBOFLOW_API_KEY
-    )
 
 
 # ==========================================
@@ -73,6 +69,8 @@ BANKNOTES = {
         "currency": "JPY",
         "amount": 1000,
         "name": "Japanese Yen",
+        "country": "Japan",
+        "symbol": "¥",
         "flag": "🇯🇵"
     },
 
@@ -80,6 +78,8 @@ BANKNOTES = {
         "currency": "JPY",
         "amount": 2000,
         "name": "Japanese Yen",
+        "country": "Japan",
+        "symbol": "¥",
         "flag": "🇯🇵"
     },
 
@@ -87,6 +87,8 @@ BANKNOTES = {
         "currency": "JPY",
         "amount": 5000,
         "name": "Japanese Yen",
+        "country": "Japan",
+        "symbol": "¥",
         "flag": "🇯🇵"
     },
 
@@ -94,6 +96,8 @@ BANKNOTES = {
         "currency": "JPY",
         "amount": 10000,
         "name": "Japanese Yen",
+        "country": "Japan",
+        "symbol": "¥",
         "flag": "🇯🇵"
     },
 
@@ -101,6 +105,8 @@ BANKNOTES = {
         "currency": "THB",
         "amount": 20,
         "name": "Thai Baht",
+        "country": "Thailand",
+        "symbol": "฿",
         "flag": "🇹🇭"
     },
 
@@ -108,6 +114,8 @@ BANKNOTES = {
         "currency": "THB",
         "amount": 50,
         "name": "Thai Baht",
+        "country": "Thailand",
+        "symbol": "฿",
         "flag": "🇹🇭"
     },
 
@@ -115,6 +123,8 @@ BANKNOTES = {
         "currency": "THB",
         "amount": 100,
         "name": "Thai Baht",
+        "country": "Thailand",
+        "symbol": "฿",
         "flag": "🇹🇭"
     },
 
@@ -122,6 +132,8 @@ BANKNOTES = {
         "currency": "THB",
         "amount": 500,
         "name": "Thai Baht",
+        "country": "Thailand",
+        "symbol": "฿",
         "flag": "🇹🇭"
     },
 
@@ -129,6 +141,8 @@ BANKNOTES = {
         "currency": "THB",
         "amount": 1000,
         "name": "Thai Baht",
+        "country": "Thailand",
+        "symbol": "฿",
         "flag": "🇹🇭"
     }
 }
@@ -150,13 +164,11 @@ def get_exchange_rate(
             "date": datetime.now().strftime("%Y-%m-%d")
         }
 
-
     url = (
         "https://api.frankfurter.app/latest"
         f"?from={from_currency}"
         f"&to={to_currency}"
     )
-
 
     response = requests.get(
         url,
@@ -167,31 +179,13 @@ def get_exchange_rate(
 
     data = response.json()
 
-
     return {
         "rate": float(
             data["rates"][to_currency]
         ),
-
         "date": data.get(
             "date",
             datetime.now().strftime("%Y-%m-%d")
-        )
-    }
-
-
-# ==========================================
-# HEALTH CHECK
-# ==========================================
-
-@app.get("/health")
-async def health():
-
-    return {
-        "status": "ok",
-        "roboflow_configured": (
-            ROBOFLOW_API_KEY is not None
-            and MODEL_ID is not None
         )
     }
 
@@ -217,20 +211,7 @@ async def detect(
     file: UploadFile = File(...)
 ):
 
-    # --------------------------------------
-    # CHECK ROBOFLOW CONFIG
-    # --------------------------------------
-
-    if client is None:
-
-        return {
-            "success": False,
-            "message": "ยังไม่ได้ตั้งค่า Roboflow API"
-        }
-
-
     temp_path = None
-
 
     try:
 
@@ -255,7 +236,7 @@ async def detect(
 
 
         # --------------------------------------
-        # ROBOFLOW INFERENCE
+        # ROBOFLOW
         # --------------------------------------
 
         result = client.infer(
@@ -272,7 +253,6 @@ async def detect(
             "predictions",
             []
         )
-
 
         if not predictions:
 
@@ -294,12 +274,10 @@ async def detect(
             )
         )
 
-
         class_name = best_prediction.get(
             "class",
             ""
         )
-
 
         confidence = float(
             best_prediction.get(
@@ -316,7 +294,6 @@ async def detect(
         banknote = BANKNOTES.get(
             class_name.lower()
         )
-
 
         if banknote is None:
 
@@ -342,6 +319,10 @@ async def detect(
 
         amount = banknote["amount"]
 
+        symbol = banknote["symbol"]
+
+        country = banknote["country"]
+
 
         # ======================================
         # TARGET CURRENCY
@@ -356,14 +337,16 @@ async def detect(
             target_currency = "JPY"
 
 
+        # ======================================
+        # EXCHANGE
+        # ======================================
+
         exchange_rate = None
+
         converted_amount = None
+
         rate_date = None
 
-
-        # ======================================
-        # EXCHANGE RATE
-        # ======================================
 
         try:
 
@@ -372,22 +355,19 @@ async def detect(
                 target_currency
             )
 
-
             exchange_rate = rate_data["rate"]
 
             rate_date = rate_data["date"]
-
 
             converted_amount = (
                 amount * exchange_rate
             )
 
-
         except Exception as e:
 
             print(
                 "Exchange rate error:",
-                repr(e)
+                e
             )
 
 
@@ -422,6 +402,12 @@ async def detect(
 
             "currency_name":
                 banknote["name"],
+
+            "country":
+                country,
+
+            "symbol":
+                symbol,
 
             "flag":
                 banknote["flag"],
@@ -472,7 +458,6 @@ async def detect(
             repr(e)
         )
 
-
         return {
 
             "success": False,
@@ -486,10 +471,6 @@ async def detect(
 
 
     finally:
-
-        # --------------------------------------
-        # DELETE TEMP IMAGE
-        # --------------------------------------
 
         if (
             temp_path
