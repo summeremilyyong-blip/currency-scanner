@@ -2,74 +2,116 @@
 // ELEMENTS
 // =====================================================
 
-const imageInput = document.getElementById("imageInput");
-const previewContainer = document.getElementById("previewContainer");
-const preview = document.getElementById("preview");
-const scanButton = document.getElementById("scanButton");
-const result = document.getElementById("result");
-const loading = document.getElementById("loading");
+const imageInput =
+    document.getElementById("imageInput");
 
-const camera = document.getElementById("camera");
-const cameraContainer = document.getElementById("cameraContainer");
-const cameraButton = document.getElementById("cameraButton");
-const captureButton = document.getElementById("captureButton");
-const switchCameraButton = document.getElementById("switchCameraButton");
-const newScanButton = document.getElementById("newScanButton");
+const previewContainer =
+    document.getElementById("previewContainer");
+
+const preview =
+    document.getElementById("preview");
+
+const scanButton =
+    document.getElementById("scanButton");
+
+const result =
+    document.getElementById("result");
+
+const loading =
+    document.getElementById("loading");
+
+const camera =
+    document.getElementById("camera");
+
+const cameraContainer =
+    document.getElementById("cameraContainer");
+
+const cameraButton =
+    document.getElementById("cameraButton");
+
+const captureButton =
+    document.getElementById("captureButton");
+
+const switchCameraButton =
+    document.getElementById("switchCameraButton");
+
+const newScanButton =
+    document.getElementById("newScanButton");
+
 
 // =====================================================
 // RESULT ELEMENTS
 // =====================================================
 
-const currencyName = document.getElementById("currencyName");
-const amount = document.getElementById("amount");
-const confidence = document.getElementById("confidence");
-const confidenceBar = document.getElementById("confidenceBar");
-const flag = document.getElementById("flag");
+const currencyName =
+    document.getElementById("currencyName");
 
-const exchangeRate = document.getElementById("exchangeRate");
-const converted = document.getElementById("converted");
-const rateDate = document.getElementById("rateDate");
-const rateTime = document.getElementById("rateTime");
+const amount =
+    document.getElementById("amount");
 
-const currencyCode = document.getElementById("currencyCode");
-const country = document.getElementById("country");
-const targetCurrency = document.getElementById("targetCurrency");
+const confidence =
+    document.getElementById("confidence");
+
+const confidenceBar =
+    document.getElementById("confidenceBar");
+
+const flag =
+    document.getElementById("flag");
+
+const exchangeRate =
+    document.getElementById("exchangeRate");
+
+const converted =
+    document.getElementById("converted");
+
+const rateDate =
+    document.getElementById("rateDate");
+
+const rateTime =
+    document.getElementById("rateTime");
+
+const currencyCode =
+    document.getElementById("currencyCode");
+
+const country =
+    document.getElementById("country");
+
+const targetCurrency =
+    document.getElementById("targetCurrency");
+
 
 // =====================================================
 // VARIABLES
 // =====================================================
 
 let selectedFile = null;
+
 let cameraStream = null;
+
 let currentFacingMode = "environment";
+
 
 // =====================================================
 // FORMAT MONEY
 // =====================================================
 
-function formatMoney(value, decimals = 2) {
-    return Number(value).toLocaleString(undefined, {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-    });
+function formatMoney(
+    value,
+    decimals = 2
+) {
+
+    return Number(value).toLocaleString(
+        undefined,
+        {
+            minimumFractionDigits:
+                decimals,
+
+            maximumFractionDigits:
+                decimals
+        }
+    );
 }
 
-// =====================================================
-// GET COUNTRY
-// =====================================================
-
-function getCountry(currency) {
-
-    if (currency === "JPY") {
-        return "Japan";
-    }
-
-    if (currency === "THB") {
-        return "Thailand";
-    }
-
-    return "-";
-}
 
 // =====================================================
 // GET CURRENCY SYMBOL
@@ -88,6 +130,7 @@ function getCurrencySymbol(currency) {
     return "";
 }
 
+
 // =====================================================
 // START CAMERA
 // =====================================================
@@ -105,44 +148,65 @@ async function startCamera() {
             return;
         }
 
+
+        // Stop old stream
+
         if (cameraStream) {
 
             cameraStream
                 .getTracks()
-                .forEach(track => track.stop());
+                .forEach(
+                    track => track.stop()
+                );
 
+            cameraStream = null;
         }
 
+
+        // Request camera
+
         cameraStream =
-            await navigator.mediaDevices.getUserMedia({
+            await navigator.mediaDevices
+                .getUserMedia({
 
-                video: {
+                    video: {
 
-                    facingMode: currentFacingMode,
+                        facingMode:
+                            currentFacingMode,
 
-                    width: {
-                        ideal: 1280
+                        width: {
+                            ideal: 1280
+                        },
+
+                        height: {
+                            ideal: 720
+                        }
+
                     },
 
-                    height: {
-                        ideal: 720
-                    }
+                    audio: false
 
-                },
+                });
 
-                audio: false
 
-            });
+        camera.srcObject =
+            cameraStream;
 
-        camera.srcObject = cameraStream;
 
         await camera.play();
 
-        cameraContainer.style.display = "block";
 
-        captureButton.style.display = "block";
+        cameraContainer.style.display =
+            "block";
 
-        switchCameraButton.style.display = "block";
+
+        captureButton.style.display =
+            "block";
+
+
+        switchCameraButton.style.display =
+            "block";
+
 
         cameraButton.textContent =
             "⏹ Stop Camera";
@@ -165,6 +229,7 @@ async function startCamera() {
 
 }
 
+
 // =====================================================
 // STOP CAMERA
 // =====================================================
@@ -175,23 +240,34 @@ function stopCamera() {
 
         cameraStream
             .getTracks()
-            .forEach(track => track.stop());
+            .forEach(
+                track => track.stop()
+            );
 
         cameraStream = null;
-
     }
+
 
     camera.srcObject = null;
 
-    cameraContainer.style.display = "none";
 
-    captureButton.style.display = "none";
+    cameraContainer.style.display =
+        "none";
 
-    switchCameraButton.style.display = "none";
+
+    captureButton.style.display =
+        "none";
+
+
+    switchCameraButton.style.display =
+        "none";
+
 
     cameraButton.textContent =
         "📷 Start Camera";
+
 }
+
 
 // =====================================================
 // CAMERA BUTTON
@@ -214,6 +290,7 @@ cameraButton.addEventListener(
     }
 );
 
+
 // =====================================================
 // SWITCH CAMERA
 // =====================================================
@@ -226,15 +303,19 @@ switchCameraButton.addEventListener(
             return;
         }
 
+
         currentFacingMode =
-            currentFacingMode === "environment"
+            currentFacingMode ===
+            "environment"
                 ? "user"
                 : "environment";
+
 
         await startCamera();
 
     }
 );
+
 
 // =====================================================
 // CAPTURE CAMERA IMAGE
@@ -253,17 +334,24 @@ captureButton.addEventListener(
             return;
         }
 
+
         const canvas =
-            document.createElement("canvas");
+            document.createElement(
+                "canvas"
+            );
+
 
         canvas.width =
             camera.videoWidth;
 
+
         canvas.height =
             camera.videoHeight;
 
+
         const context =
             canvas.getContext("2d");
+
 
         context.drawImage(
             camera,
@@ -272,6 +360,7 @@ captureButton.addEventListener(
             canvas.width,
             canvas.height
         );
+
 
         canvas.toBlob(
             async function (blob) {
@@ -285,32 +374,43 @@ captureButton.addEventListener(
                     return;
                 }
 
+
                 const file =
                     new File(
                         [blob],
                         "camera-scan.jpg",
                         {
-                            type: "image/jpeg"
+                            type:
+                                "image/jpeg"
                         }
                     );
 
+
                 selectedFile = file;
 
+
                 preview.src =
-                    URL.createObjectURL(file);
+                    URL.createObjectURL(
+                        file
+                    );
+
 
                 previewContainer.style.display =
                     "block";
 
+
                 await scanFile(file);
 
             },
+
             "image/jpeg",
+
             0.92
         );
 
     }
 );
+
 
 // =====================================================
 // IMAGE UPLOAD
@@ -320,31 +420,42 @@ imageInput.addEventListener(
     "change",
     function () {
 
-        const file = this.files[0];
+        const file =
+            this.files[0];
+
 
         if (!file) {
             return;
         }
 
+
         selectedFile = file;
 
+
         preview.src =
-            URL.createObjectURL(file);
+            URL.createObjectURL(
+                file
+            );
+
 
         previewContainer.style.display =
             "block";
 
+
         result.style.display =
             "none";
 
+
         scanButton.style.display =
             "block";
+
 
         loading.style.display =
             "none";
 
     }
 );
+
 
 // =====================================================
 // UPLOAD SCAN BUTTON
@@ -363,10 +474,14 @@ scanButton.addEventListener(
             return;
         }
 
-        await scanFile(selectedFile);
+
+        await scanFile(
+            selectedFile
+        );
 
     }
 );
+
 
 // =====================================================
 // SCAN FILE
@@ -376,33 +491,49 @@ async function scanFile(file) {
 
     try {
 
-        result.style.display = "none";
+        result.style.display =
+            "none";
 
-        loading.style.display = "block";
 
-        scanButton.disabled = true;
+        loading.style.display =
+            "block";
 
-        captureButton.disabled = true;
 
-        const formData = new FormData();
+        scanButton.disabled =
+            true;
+
+
+        captureButton.disabled =
+            true;
+
+
+        const formData =
+            new FormData();
+
 
         formData.append(
             "file",
             file
         );
 
+
         console.log(
             "Sending image to server..."
         );
+
 
         const response =
             await fetch(
                 "/detect",
                 {
+
                     method: "POST",
+
                     body: formData
+
                 }
             );
+
 
         if (!response.ok) {
 
@@ -422,13 +553,16 @@ async function scanFile(file) {
 
         }
 
+
         const data =
             await response.json();
+
 
         console.log(
             "Server response:",
             data
         );
+
 
         if (!data.success) {
 
@@ -440,11 +574,14 @@ async function scanFile(file) {
             return;
         }
 
+
         // =================================================
         // DISPLAY RESULT
         // =================================================
 
-        result.style.display = "block";
+        result.style.display =
+            "block";
+
 
         // =================================================
         // CURRENCY NAME
@@ -455,6 +592,7 @@ async function scanFile(file) {
             data.currency ||
             "-";
 
+
         // =================================================
         // FLAG
         // =================================================
@@ -464,10 +602,9 @@ async function scanFile(file) {
             (
                 data.currency === "JPY"
                     ? "🇯🇵"
-                    : data.currency === "THB"
-                        ? "🇹🇭"
-                        : "💵"
+                    : "🇹🇭"
             );
+
 
         // =================================================
         // AMOUNT
@@ -478,6 +615,7 @@ async function scanFile(file) {
                 data.currency
             );
 
+
         amount.textContent =
             symbol +
             formatMoney(
@@ -485,18 +623,21 @@ async function scanFile(file) {
                 0
             );
 
+
         // =================================================
         // CONFIDENCE
         // =================================================
 
         const confidenceValue =
             Number(
-                data.confidence || 0
+                data.confidence
             );
 
+
         confidence.textContent =
-            confidenceValue.toFixed(2) +
-            "%";
+            confidenceValue.toFixed(2)
+            + "%";
+
 
         confidenceBar.style.width =
             Math.min(
@@ -504,60 +645,95 @@ async function scanFile(file) {
                 100
             ) + "%";
 
+
         // =================================================
         // DETAILS
         // =================================================
 
         currencyCode.textContent =
-            data.currency || "-";
+            data.currency ||
+            "-";
+
 
         country.textContent =
             data.country ||
-            getCountry(data.currency);
+            (
+                data.currency === "JPY"
+                    ? "Japan"
+                    : data.currency === "THB"
+                        ? "Thailand"
+                        : "-"
+            );
+
 
         targetCurrency.textContent =
             data.target_currency ||
             "-";
+
 
         // =================================================
         // EXCHANGE RATE
         // =================================================
 
         if (
-            data.exchange_rate !== null &&
-            data.exchange_rate !== undefined &&
-            data.converted_amount !== null &&
-            data.converted_amount !== undefined
+
+            data.exchange_rate !==
+                null &&
+
+            data.exchange_rate !==
+                undefined &&
+
+            data.converted_amount !==
+                null &&
+
+            data.converted_amount !==
+                undefined
+
         ) {
 
             exchangeRate.textContent =
+
                 "1 " +
+
                 data.currency +
+
                 " = " +
+
                 Number(
                     data.exchange_rate
                 ).toFixed(6) +
+
                 " " +
+
                 data.target_currency;
+
 
             const targetSymbol =
                 getCurrencySymbol(
                     data.target_currency
                 );
 
+
             converted.textContent =
+
                 "≈ " +
+
                 targetSymbol +
+
                 formatMoney(
                     data.converted_amount,
                     2
                 );
 
+
             rateDate.textContent =
-                data.rate_date || "-";
+                data.rate_date ||
+                "-";
+
 
             rateTime.textContent =
-                data.rate_time || "-";
+                data.checked_time ||
+                "-";
 
         }
 
@@ -566,24 +742,31 @@ async function scanFile(file) {
             exchangeRate.textContent =
                 "Exchange rate unavailable";
 
+
             converted.textContent =
                 "—";
 
+
             rateDate.textContent =
                 "-";
+
 
             rateTime.textContent =
                 "-";
 
         }
 
+
         // =================================================
         // SCROLL TO RESULT
         // =================================================
 
         result.scrollIntoView({
+
             behavior: "smooth",
+
             block: "start"
+
         });
 
     }
@@ -595,24 +778,31 @@ async function scanFile(file) {
             error
         );
 
+
         alert(
             "เกิดข้อผิดพลาดในการเชื่อมต่อ Server\n\n" +
-            "กรุณาตรวจสอบว่า Server กำลังทำงานอยู่"
+            "กรุณาตรวจสอบว่า Server ทำงานอยู่"
         );
 
     }
 
     finally {
 
-        loading.style.display = "none";
+        loading.style.display =
+            "none";
 
-        scanButton.disabled = false;
 
-        captureButton.disabled = false;
+        scanButton.disabled =
+            false;
+
+
+        captureButton.disabled =
+            false;
 
     }
 
 }
+
 
 // =====================================================
 // NEW SCAN
@@ -624,32 +814,46 @@ newScanButton.addEventListener(
 
         selectedFile = null;
 
-        imageInput.value = "";
 
-        preview.src = "";
+        imageInput.value =
+            "";
+
+
+        preview.src =
+            "";
+
 
         previewContainer.style.display =
             "none";
 
+
         scanButton.style.display =
             "none";
+
 
         result.style.display =
             "none";
 
+
         loading.style.display =
             "none";
+
 
         confidenceBar.style.width =
             "0%";
 
+
         window.scrollTo({
+
             top: 0,
+
             behavior: "smooth"
+
         });
 
     }
 );
+
 
 // =====================================================
 // CLEAN CAMERA WHEN LEAVING PAGE
